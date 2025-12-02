@@ -3,7 +3,6 @@
 
 lje = lje or {}
 lje.con_print("Starting LJE startup script...")
-
 local HOOK_CALL_BC_HASH = 0xBD59600A
 local p = cloned_mts.Player
 local PlayerNick = p.Nick
@@ -13,8 +12,6 @@ local surface_SetFont = surface.SetFont
 local surface_SetTextPos = surface.SetTextPos
 local surface_SetTextColor = surface.SetTextColor
 local surface_DrawText = surface.DrawText
-local disable_hooks = lje.disable_hooks
-local enable_hooks = lje.enable_hooks
 
 local function cam_Start2D()
     cam_Start({type = "2D"})
@@ -34,15 +31,17 @@ local lastHookCallTime = SysTime()
 local hookCallThreshold = 5 -- seconds
 local origHookCall = rawget(origHook, "Call")
 local hook = {Call = origHookCall}
+
 local function hookCallHk(name, gm, ...)
     local a, b, c, d, e, f = hook.Call(name, gm, ...)
 
-    disable_hooks()
-        lastHookCallTime = SysTime()
-        local stack = lje.get_call_stack()
+    lje.hooks.disable()
+        local stack = lje.util.get_call_stack()
         local lua_involved = #stack > 1
 
         if name == "PostRender" then
+            lastHookCallTime = SysTime()
+
             if not lua_involved then
                 aimbot.run()
 
@@ -66,13 +65,21 @@ local function hookCallHk(name, gm, ...)
                         curY = curY + 20
                     end
 
+                    surface_SetTextPos(10, curY)
+                    surface_SetTextColor(0, 255, 0, 255)
+                    surface_DrawText(string.format("GC Memory: %d B", lje.gc.get_total()))
+                    curY = curY + 20
+
                     esp.run()
                 cam_End2D()
+
+                -- Reduce our GC footprint
+                lje.gc.run_full_gc()
             else
                 lje.con_print("Detected Lua interference in PostRender, bailing...")
             end
         end
-    enable_hooks()
+    lje.hooks.enable()
     return a, b, c, d, e, f
 end
 
@@ -80,15 +87,15 @@ local hk = rawget(_G, "hook")
 rawset(hk, "Call", lje.detour(origHookCall, hookCallHk))
 
 lje.con_print("hook.Call detoured in startup script.")
-if lje.get_bytecode_hash(origHookCall) ~= HOOK_CALL_BC_HASH then
+if lje.util.get_bytecode_hash(origHookCall) ~= HOOK_CALL_BC_HASH then
     lje.con_print(string.format("** WARNING: hook.Call bytecode hash mismatch! Expected 0x%X, got 0x%X **", HOOK_CALL_BC_HASH, lje.get_bytecode_hash(origHookCall)))
 else
     lje.con_print("hook.Call bytecode hash verified.")
 end
 
 local stringCount = 0
-lje.set_push_string_callback(function()
-    lje.disable_hooks()
+lje.util.set_push_string_callback(function()
+    lje.hooks.disable()
     stringCount = stringCount + 1
     if stringCount % 4000 == 0 then
         -- Check if hook.Call was overriden
@@ -102,14 +109,12 @@ lje.set_push_string_callback(function()
         -- call us at the end of the detour. If we restore it, that just causes recursion issues.
         -- (origHookCall -> addon detour -> us)
         -- (hook.Call -> us -> addon detour -> us -> ...)
-        if timeSinceLastHookCall < hookCallThreshold then
-            isDetoured = false
-        end
+        isDetoured = isDetoured and timeSinceLastHookCall > hookCallThreshold
 
         if isDetoured then
             -- Restore hook.Call
             origHookCall = callFn
-            if lje.get_bytecode_hash(origHookCall) ~= HOOK_CALL_BC_HASH then
+            if lje.util.get_bytecode_hash(origHookCall) ~= HOOK_CALL_BC_HASH then
                 lje.con_print(string.format("** WARNING: hook.Call bytecode hash mismatch during periodic check! Expected 0x%X, got 0x%X **", HOOK_CALL_BC_HASH, lje.get_bytecode_hash(origHookCall)))
             else
                 lje.con_print("hook.Call bytecode hash verified during periodic check.")
@@ -120,5 +125,6 @@ lje.set_push_string_callback(function()
             lje.con_print("Modification detected, restored hook.Call detour.")
         end
     end
-    lje.enable_hooks()
+    lje.hooks.enable()
 end)
+lje.con_print("GILBHAX initialized. Unfreezing GC.")
