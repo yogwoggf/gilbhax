@@ -72,9 +72,6 @@ local function hookCallHk(name, gm, ...)
 
                     esp.run()
                 cam_End2D()
-
-                -- Reduce our GC footprint
-                lje.gc.run_full_gc()
             else
                 lje.con_print("Detected Lua interference in PostRender, bailing...")
             end
