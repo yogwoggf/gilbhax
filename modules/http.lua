@@ -8,9 +8,9 @@ local function httpHk(params)
             url = tostring(url)
         end
 
-        lje.con_print("[HTTP] HTTP request to URL: " .. url)
+        lje.con_printf("[HTTP] HTTP request to URL: $yellow{%s}", url)
         if not urls.is_url_allowed(url) then
-            lje.con_print("[HTTP] Blocked HTTP request to URL: " .. url)
+            lje.con_printf("[HTTP] Blocked HTTP request to URL: $red{%s}", url)
             lje.hooks.enable()
             return true -- make them think it was queued
         end

@@ -5,13 +5,13 @@ local urls = lje.require("config/urls.lua")
 local origPanelOpenURL = FindMetaTable("Panel").OpenURL
 local function panelOpenUrlHk(self, url)
     lje.hooks.disable()
-    lje.con_print("[Panel:OpenURL] Attempt to open URL: " .. url)
+    lje.con_printf("[Panel:OpenURL] Attempt to open URL: $yellow{%s}", url)
     if urls.is_url_allowed(url) then
-        lje.con_print("[Panel:OpenURL] Allowing URL: " .. url)
+        lje.con_printf("[Panel:OpenURL] Allowing URL: $yellow{%s}", url)
         lje.hooks.enable()
         return origPanelOpenURL(self, url)
     else
-        lje.con_print("[OpenURL] Blocking URL: " .. url)
+        lje.con_printf("[Panel:OpenURL] Blocking URL: $red{%s}", url)
         lje.hooks.enable()
         return
     end
@@ -22,13 +22,13 @@ FindMetaTable("Panel").OpenURL = lje.detour(origPanelOpenURL, panelOpenUrlHk)
 local origGuiOpenURL = gui.OpenURL
 local function guiOpenUrlHk(url)
     lje.hooks.disable()
-    lje.con_print("[gui.OpenURL] Attempt to open URL: " .. url)
+    lje.con_printf("[gui.OpenURL] Attempt to open URL: $yellow{%s}", url)
     if urls.is_url_allowed(url) then
-        lje.con_print("[gui.OpenURL] Allowing URL: " .. url)
+        lje.con_printf("[gui.OpenURL] Allowing URL: $yellow{%s}", url)
         lje.hooks.enable()
         return origGuiOpenURL(url)
     else
-        lje.con_print("[gui.OpenURL] Blocking URL: " .. url)
+        lje.con_printf("[gui.OpenURL] Blocking URL: $red{%s}", url)
         lje.hooks.enable()
         return
     end
