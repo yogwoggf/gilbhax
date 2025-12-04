@@ -85,7 +85,7 @@ rawset(hk, "Call", lje.detour(origHookCall, hookCallHk))
 
 lje.con_print("hook.Call detoured in startup script.")
 if lje.util.get_bytecode_hash(origHookCall) ~= HOOK_CALL_BC_HASH then
-    lje.con_print(string.format("** WARNING: hook.Call bytecode hash mismatch! Expected 0x%X, got 0x%X **", HOOK_CALL_BC_HASH, lje.get_bytecode_hash(origHookCall)))
+    lje.con_print(string.format("** WARNING: hook.Call bytecode hash mismatch! Expected 0x%X, got 0x%X **", HOOK_CALL_BC_HASH, lje.util.get_bytecode_hash(origHookCall)))
 else
     lje.con_print("hook.Call bytecode hash verified.")
 end
