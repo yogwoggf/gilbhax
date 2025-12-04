@@ -1,0 +1,37 @@
+-- Detours, logs and possibly blocks both Panel:OpenURL and gui.OpenURL
+local urls = lje.require("config/urls.lua")
+-- running in preinit, so no need to use rawget or anything
+
+local origPanelOpenURL = FindMetaTable("Panel").OpenURL
+local function panelOpenUrlHk(self, url)
+    lje.hooks.disable()
+    lje.con_print("[Panel:OpenURL] Attempt to open URL: " .. url)
+    if urls.is_url_allowed(url) then
+        lje.con_print("[Panel:OpenURL] Allowing URL: " .. url)
+        lje.hooks.enable()
+        return origPanelOpenURL(self, url)
+    else
+        lje.con_print("[OpenURL] Blocking URL: " .. url)
+        lje.hooks.enable()
+        return
+    end
+end
+
+FindMetaTable("Panel").OpenURL = lje.detour(origPanelOpenURL, panelOpenUrlHk)
+
+local origGuiOpenURL = gui.OpenURL
+local function guiOpenUrlHk(url)
+    lje.hooks.disable()
+    lje.con_print("[gui.OpenURL] Attempt to open URL: " .. url)
+    if urls.is_url_allowed(url) then
+        lje.con_print("[gui.OpenURL] Allowing URL: " .. url)
+        lje.hooks.enable()
+        return origGuiOpenURL(url)
+    else
+        lje.con_print("[gui.OpenURL] Blocking URL: " .. url)
+        lje.hooks.enable()
+        return
+    end
+end
+
+_G.gui.OpenURL = lje.detour(origGuiOpenURL, guiOpenUrlHk)

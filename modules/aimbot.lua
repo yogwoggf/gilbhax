@@ -8,13 +8,12 @@ local A = cloned_mts.Angle
 
 local pid = lje.include("util/pid.lua")
 
+local config = lje.require("config/aimbot.lua")
 local aimbot = {}
 aimbot.target = nil
-aimbot.bind = KEY_H
-aimbot.min_distance = 1000 -- in units
 -- integrals aren't used, because of steady state error not being an issue in aimbot
-aimbot.pitch_pid = pid.new(35, 0.2, 0, -360, 360)
-aimbot.yaw_pid = pid.new(42, 0.3, 0, -360, 360)
+aimbot.pitch_pid = pid.new(config.pitch_response[1], config.pitch_response[2], config.pitch_response[3], -360, 360)
+aimbot.yaw_pid = pid.new(config.yaw_response[1], config.yaw_response[2], config.yaw_response[3], -360, 360)
 aimbot.last_time = SysTime()
 
 local function normalizeAngle(ang)
@@ -27,14 +26,14 @@ function aimbot.run()
     local dt = SysTime() - aimbot.last_time
     aimbot.last_time = SysTime()
 
-    if not input.IsKeyDown(aimbot.bind) then
+    if not input.IsKeyDown(config.bind) then
         aimbot.target = nil -- Remove latch on target with key up
     end
 
-    if not aimbot.target and input.IsKeyDown(aimbot.bind) then
+    if not aimbot.target and input.IsKeyDown(config.bind) then
         local qualifiedPlayers = {}
         for _, ply in ipairs(player.GetAll()) do
-            if (not E.__eq(ply, LocalPlayer())) and V.Distance(E.GetPos(LocalPlayer()), E.GetPos(ply)) <= aimbot.min_distance and P.Alive(ply) then
+            if (not E.__eq(ply, LocalPlayer())) and V.Distance(E.GetPos(LocalPlayer()), E.GetPos(ply)) <= config.min_distance and P.Alive(ply) then
                 table.insert(qualifiedPlayers, ply)
             end
         end
@@ -68,10 +67,10 @@ function aimbot.run()
     if aimbot.target and P.Alive(aimbot.target) then
         local lp = LocalPlayer()
         local targetPos = E.GetBonePosition(aimbot.target, E.GetHitBoxBone(aimbot.target, 0, 0))
-        local selfVelPredict = mul(E.GetVelocity(lp), 0.025)
+        local selfVelPredict = mul(E.GetVelocity(lp), config.self_velocity_compensation)
         targetPos = sub(targetPos, selfVelPredict)
 
-        local targetVelPredict = mul(E.GetVelocity(aimbot.target), 0.015)
+        local targetVelPredict = mul(E.GetVelocity(aimbot.target), config.target_velocity_compensation)
         targetPos = add(targetPos, targetVelPredict)
 
         local startPos = P.GetShootPos(lp)

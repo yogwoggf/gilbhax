@@ -36,8 +36,9 @@ local function hookCallHk(name, gm, ...)
     local a, b, c, d, e, f = hook.Call(name, gm, ...)
 
     lje.hooks.disable()
-        local stack = lje.util.get_call_stack()
-        local lua_involved = #stack > 1
+        -- If an anticheat is doing hook.Call("PostRender", ...), it's probably to detect us and we'll just skip our code.
+        -- Skip 1 frame (us) to avoid false positives.
+        local lua_involved = lje.env.is_lua_involved(1)
 
         if name == "PostRender" then
             lastHookCallTime = SysTime()

@@ -1,10 +1,5 @@
 -- No state necessary for this module, just needs a detour
-
-local ALLOWED_HTTP_URLS = {
-    ".*github%.com.*",
-    ".*pastebin%.com.*",
-}
-
+local urls = lje.require("config/urls.lua")
 local origHttp = HTTP
 local function httpHk(params)
     lje.hooks.disable()
@@ -13,18 +8,9 @@ local function httpHk(params)
             url = tostring(url)
         end
 
-        lje.con_print("HTTP request to URL: " .. url)
-        local allowed = false
-
-        for _, pattern in ipairs(ALLOWED_HTTP_URLS) do
-            if string.match(url, pattern) then
-                allowed = true
-                break
-            end
-        end
-
-        if not allowed then
-            lje.con_print("Blocked HTTP request to disallowed URL: " .. url)
+        lje.con_print("[HTTP] HTTP request to URL: " .. url)
+        if not urls.is_url_allowed(url) then
+            lje.con_print("[HTTP] Blocked HTTP request to URL: " .. url)
             lje.hooks.enable()
             return true -- make them think it was queued
         end
