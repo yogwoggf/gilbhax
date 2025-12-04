@@ -19,7 +19,7 @@ end
 
 local aimbot = lje.include("modules/aimbot.lua")
 local esp = lje.include("modules/esp.lua")
-local screengrab = lje.include("modules/screengrab.lua")
+local screengrab = lje.require("modules/screengrab.lua")
 
 local origHook = rawget(_G, "hook")
 if not origHook then
