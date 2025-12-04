@@ -112,7 +112,7 @@ lje.util.set_push_string_callback(function()
             -- Restore hook.Call
             origHookCall = callFn
             if lje.util.get_bytecode_hash(origHookCall) ~= HOOK_CALL_BC_HASH then
-                lje.con_print(string.format("** WARNING: hook.Call bytecode hash mismatch during periodic check! Expected 0x%X, got 0x%X **", HOOK_CALL_BC_HASH, lje.get_bytecode_hash(origHookCall)))
+                lje.con_print(string.format("** WARNING: hook.Call bytecode hash mismatch during periodic check! Expected 0x%X, got 0x%X **", HOOK_CALL_BC_HASH, lje.util.get_bytecode_hash(origHookCall)))
             else
                 lje.con_print("hook.Call bytecode hash verified during periodic check.")
             end
