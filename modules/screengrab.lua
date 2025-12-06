@@ -17,15 +17,10 @@ end
 local render = rawget(_G, "render")
 rawset(render, "Capture", lje.detour(origCapture, function(tbl)
     lje.hooks.disable()
-        lje.con_printf("[Screengrab] $yellow{Detected screengrab attempt.}")
-        if type(tbl) == "table" then
-            local format = rawget(tbl, "format") or "jpeg"
-            lje.con_printf("[Screengrab] Format: $green{%s}", format)
-        end
-        local traceback = debug.traceback("\n\t")
-        lje.con_printf("[Screengrab] Traceback: $red{%s}", traceback)
         screengrab.last_screengrab_time = SysTime()
     lje.hooks.enable()
+
     return origCapture(tbl)
 end))
+
 return screengrab
