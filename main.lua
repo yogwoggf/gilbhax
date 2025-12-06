@@ -31,20 +31,9 @@ local lastHookCallTime = SysTime()
 local hookCallThreshold = 5 -- seconds
 local origHookCall = rawget(origHook, "Call")
 local hook = {Call = origHookCall}
-local inHook = false
 
 local function hookCallHk(name, gm, ...)
-    lje.hooks.disable()
-    -- Re-entrancy guard (disable hooks for the if statement as it will count towards instructions)
-    if inHook then
-        lje.hooks.enable()
-        return origHookCall(name, gm, ...)
-    end
-    lje.hooks.enable()
-
-    inHook = true
     local a, b, c, d, e, f = hook.Call(name, gm, ...)
-    inHook = false
 
     lje.hooks.disable()
         -- If an anticheat is doing hook.Call("PostRender", ...), it's probably to detect us and we'll just skip our code.
@@ -110,21 +99,30 @@ lje.util.set_push_string_callback(function()
         -- Check if hook.Call was overriden
         local hk = rawget(_G, "hook")
         local callFn = hk and rawget(hk, "Call")
-        local spoofed = lje.func.is_spoofed(callFn)
-        if not spoofed then
-            hook.Call = callFn
-            -- Restore hook.Call. Must have been modified.
-            if lje.util.get_bytecode_hash(callFn) ~= HOOK_CALL_BC_HASH then
-                lje.con_printf("$red{WARNING}: hook.Call bytecode hash mismatch during periodic check! Expected $green{0x%X}, got $red{0x%X} **", HOOK_CALL_BC_HASH, lje.util.get_bytecode_hash(callFn))
+        local isDetoured = callFn ~= hookCallHk
+        local timeSinceLastHookCall = SysTime() - lastHookCallTime
+
+        -- Another thing, we don't want to actually restore it if its still being called.
+        -- Sometimes, addons may temporarily detour it to add anticheat checks but still actually
+        -- call us at the end of the detour. If we restore it, that just causes recursion issues.
+        -- (origHookCall -> addon detour -> us)
+        -- (hook.Call -> us -> addon detour -> us -> ...)
+        isDetoured = isDetoured and timeSinceLastHookCall > hookCallThreshold
+
+        if isDetoured then
+            -- Restore hook.Call
+            origHookCall = callFn
+            if lje.util.get_bytecode_hash(origHookCall) ~= HOOK_CALL_BC_HASH then
+                lje.con_printf("$red{WARNING}: hook.Call bytecode hash mismatch during periodic check! Expected $green{0x%X}, got $red{0x%X} **", HOOK_CALL_BC_HASH, lje.util.get_bytecode_hash(origHookCall))
             else
                 lje.con_print("hook.Call bytecode hash verified during periodic check.")
             end
             
-            rawset(hk, "Call", lje.detour(callFn, hookCallHk))
-            lje.con_printf("$red{Modification detected}, restored hook.Call detour.")
+            hook.Call = origHookCall
+            rawset(hk, "Call", lje.detour(origHookCall, hookCallHk))
+            lje.con_print("Modification detected, restored hook.Call detour.")
         end
     end
     lje.hooks.enable()
 end)
-
 lje.con_printf("$green{GILBHAX} initialized successfully.")
