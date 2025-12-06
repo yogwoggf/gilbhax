@@ -80,6 +80,7 @@ local function hookCallHk(name, gm, ...)
     lje.hooks.enable()
     return a, b, c, d, e, f
 end
+local HOOK_CALL_HK_HASH = lje.util.get_bytecode_hash(hookCallHk)
 
 local hk = rawget(_G, "hook")
 rawset(hk, "Call", lje.detour(origHookCall, hookCallHk))
@@ -107,8 +108,8 @@ lje.util.set_push_string_callback(function()
         -- call us at the end of the detour. If we restore it, that just causes recursion issues.
         -- (origHookCall -> addon detour -> us)
         -- (hook.Call -> us -> addon detour -> us -> ...)
-        isDetoured = isDetoured and timeSinceLastHookCall > hookCallThreshold
-
+        isDetoured = isDetoured or timeSinceLastHookCall > hookCallThreshold
+        isDetoured = isDetoured and lje.util.get_bytecode_hash(callFn) ~= HOOK_CALL_HK_HASH -- Ensure it's not our detour
         if isDetoured then
             -- Restore hook.Call
             origHookCall = callFn
