@@ -35,6 +35,7 @@ local hook = {Call = origHookCall}
 
 local function hookCallHk(name, gm, ...)
     lje.hooks.disable()
+    lje.env.disable_metatables() -- Prevent anyone from detecting us via metatables
         -- Auto bhop :)
         if name == "CreateMove" then
             local cmd = select(1, ...)
@@ -42,6 +43,7 @@ local function hookCallHk(name, gm, ...)
                 bhop.run(cmd)
             end
         end
+    lje.env.enable_metatables()
     lje.hooks.enable()
     local a, b, c, d, e, f = hook.Call(name, gm, ...)
 
