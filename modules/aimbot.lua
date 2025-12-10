@@ -23,6 +23,9 @@ local function normalizeAngle(ang)
 end
 
 function aimbot.run()
+    -- update pids
+    aimbot.pitch_pid.kp = config.pitch_response[1]
+    aimbot.yaw_pid.kp = config.yaw_response[1]
     local dt = SysTime() - aimbot.last_time
     aimbot.last_time = SysTime()
 

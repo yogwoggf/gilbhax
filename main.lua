@@ -20,6 +20,7 @@ end
 local aimbot = lje.include("modules/aimbot.lua")
 local esp = lje.include("modules/esp.lua")
 local screengrab = lje.require("modules/screengrab.lua")
+local bhop = lje.include("modules/bhop.lua")
 
 local origHook = rawget(_G, "hook")
 if not origHook then
@@ -33,9 +34,19 @@ local origHookCall = rawget(origHook, "Call")
 local hook = {Call = origHookCall}
 
 local function hookCallHk(name, gm, ...)
+    lje.hooks.disable()
+        -- Auto bhop :)
+        if name == "CreateMove" then
+            local cmd = select(1, ...)
+            if cmd then
+                bhop.run(cmd)
+            end
+        end
+    lje.hooks.enable()
     local a, b, c, d, e, f = hook.Call(name, gm, ...)
 
     lje.hooks.disable()
+    lje.env.disable_metatables() -- Prevent anyone from detecting us via metatables
         -- If an anticheat is doing hook.Call("PostRender", ...), it's probably to detect us and we'll just skip our code.
         -- Skip 1 frame (us) to avoid false positives.
         local lua_involved = lje.env.is_lua_involved(1)
@@ -77,6 +88,7 @@ local function hookCallHk(name, gm, ...)
                 lje.con_print("Detected Lua interference in PostRender, bailing...")
             end
         end
+    lje.env.enable_metatables()
     lje.hooks.enable()
     return a, b, c, d, e, f
 end
@@ -95,6 +107,7 @@ end
 local stringCount = 0
 lje.util.set_push_string_callback(function()
     lje.hooks.disable()
+    lje.env.disable_metatables()
     stringCount = stringCount + 1
     if stringCount % 4000 == 0 then
         -- Check if hook.Call was overriden
@@ -124,6 +137,13 @@ lje.util.set_push_string_callback(function()
             lje.con_print("Modification detected, restored hook.Call detour.")
         end
     end
+    lje.env.enable_metatables()
     lje.hooks.enable()
 end)
 lje.con_printf("$green{GILBHAX} initialized successfully.")
+
+_G.lje_print_something = function(obj)
+    lje.env.disable_metatables()
+    print("Hey!!! HEres your print: " .. tostring(obj), obj)
+    lje.env.enable_metatables()
+end
