@@ -141,9 +141,3 @@ lje.util.set_push_string_callback(function()
     lje.hooks.enable()
 end)
 lje.con_printf("$green{GILBHAX} initialized successfully.")
-
-_G.lje_print_something = function(obj)
-    lje.env.disable_metatables()
-    print("Hey!!! HEres your print: " .. tostring(obj), obj)
-    lje.env.enable_metatables()
-end
