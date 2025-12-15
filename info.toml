@@ -1,0 +1,7 @@
+# info.toml allows you to specify metadata about your script.
+
+[script]
+name = "gilbhax"
+version = "1.0.0"
+author = "yogwoggf"
+dependencies = []
