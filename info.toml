@@ -4,4 +4,6 @@
 name = "gilbhax"
 version = "1.0.0"
 author = "yogwoggf"
-dependencies = []
+dependencies = [
+    "Eyoko1.ljeutil"
+]

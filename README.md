@@ -4,6 +4,10 @@ gilbhax is an [LJE](https://github.com/yogwoggf/lj-expand) script for Garry's Mo
 
 This is just an example LJE script to demonstrate active code execution with LJE and how to structure scripts around stealth. Gilbhax currently remains undetected on a majority of anti-cheat systems. Use at your own risk! (or don't cheat at all!)
 
+# Dependencies
+
+You **NEED** to have [ljeutil](https://github.com/Eyoko1/ljeutil) installed for gilbhax to work. Simply clone it into your `.lje_scripts` folder alongside gilbhax.
+
 ## Features
 
 - Aimbot
