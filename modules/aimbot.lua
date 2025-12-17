@@ -9,6 +9,8 @@ local A = cloned_mts.Angle
 local pid = lje.include("util/pid.lua")
 
 local config = lje.require("config/aimbot.lua")
+config:save()
+
 local aimbot = {}
 aimbot.target = nil
 -- integrals aren't used, because of steady state error not being an issue in aimbot
@@ -21,6 +23,13 @@ local function normalizeAngle(ang)
     while ang < -180 do ang = ang + 360 end
     return ang
 end
+-- Bind key is specified as the enum name for the corresponding KEY_* enum value
+-- This is a little gross so brace yourself
+aimbot.bind_code = _L["KEY_" .. config.bind] 
+if not aimbot.bind_code then
+    lje.con_print("Invalid bind key specified in config/aimbot.lua")
+    aimbot.bind_code = KEY_H
+end
 
 function aimbot.run()
     -- update pids
@@ -29,11 +38,13 @@ function aimbot.run()
     local dt = SysTime() - aimbot.last_time
     aimbot.last_time = SysTime()
 
-    if not input.IsKeyDown(config.bind) then
+    if not input.IsKeyDown(aimbot.bind_code) then
         aimbot.target = nil -- Remove latch on target with key up
     end
 
-    if not aimbot.target and input.IsKeyDown(config.bind) and not vgui.CursorVisible() then
+    -- Bind key is specified as the enum name for the corresponding KEY_* enum value
+    -- This is a little gross so brace yourself
+    if not aimbot.target and input.IsKeyDown(aimbot.bind_code) and not vgui.CursorVisible() then
         local qualifiedPlayers = {}
         for _, ply in ipairs(player.GetAll()) do
             if (not E.__eq(ply, LocalPlayer())) and V.Distance(E.GetPos(LocalPlayer()), E.GetPos(ply)) <= config.min_distance and P.Alive(ply) then

@@ -2,6 +2,8 @@ local U = cloned_mts.CUserCmd
 local E = cloned_mts.Entity
 local config = lje.require("config/bhop.lua")
 local aimbotConfig = lje.require("config/aimbot.lua")
+config:save()
+
 local bhop = {}
 
 function bhop.run(cmd)
