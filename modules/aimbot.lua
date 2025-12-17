@@ -33,7 +33,7 @@ function aimbot.run()
         aimbot.target = nil -- Remove latch on target with key up
     end
 
-    if not aimbot.target and input.IsKeyDown(config.bind) then
+    if not aimbot.target and input.IsKeyDown(config.bind) and not vgui.CursorVisible() then
         local qualifiedPlayers = {}
         for _, ply in ipairs(player.GetAll()) do
             if (not E.__eq(ply, LocalPlayer())) and V.Distance(E.GetPos(LocalPlayer()), E.GetPos(ply)) <= config.min_distance and P.Alive(ply) then

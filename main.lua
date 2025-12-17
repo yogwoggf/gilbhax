@@ -2,14 +2,13 @@
 -- They re-enable as soon as this script finishes.
 
 lje = lje or {}
-
 local p = cloned_mts.Player
 local aimbot = lje.include("modules/aimbot.lua")
 local esp = lje.include("modules/esp.lua")
 local screengrab = lje.require("modules/screengrab.lua")
 local bhop = lje.include("modules/bhop.lua")
 
-hook.post("PostRender", "gilbhax.ui", function()
+hook.pre("DrawRT", "gilbhax.ui", function()
     lje.env.disable_metatables() -- Prevent anyone from detecting us via metatables
         aimbot.run()
 

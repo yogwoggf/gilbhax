@@ -5,7 +5,7 @@ local V = cloned_mts.Vector
 local esp = {}
 esp.max_distance = 1000 -- in units
 esp.player_mat = Material("models/shiny")
-
+esp.studiorender_flags = bit.bor(STUDIO_RENDER, STUDIO_NOSHADOWS, STUDIO_STATIC_LIGHTING)
 function esp.run()
     for _, ply in ipairs(player.GetAll()) do
         if not E.__eq(ply, LocalPlayer()) and V.Distance(E.GetPos(LocalPlayer()), E.GetPos(ply)) <= esp.max_distance and P.Alive(ply) then
@@ -48,7 +48,7 @@ function esp.run()
                 local oldR, oldG, oldB = render.GetColorModulation()
                 local r = V.Distance(E.GetPos(LocalPlayer()), E.GetPos(ply)) / esp.max_distance
                 render.SetColorModulation(1 - (r * r * r), 1, 0)
-                E.DrawModel(ply)
+                lje.util.safe_draw_model(ply, esp.studiorender_flags)
                 render.MaterialOverride(nil)
                 render.SetColorModulation(oldR, oldG, oldB)
                 render.SuppressEngineLighting(false)

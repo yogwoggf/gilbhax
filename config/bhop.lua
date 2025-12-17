@@ -1,5 +1,5 @@
 return {
-    enabled = false,
-    strafing = true,
+    enabled = true,
+    strafing = false,
     strafe_speed = 300
 }
