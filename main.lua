@@ -10,6 +10,7 @@ local bhop = lje.include("modules/bhop.lua")
 
 hook.pre("DrawRT", "gilbhax.ui", function()
     lje.env.disable_metatables() -- Prevent anyone from detecting us via metatables
+    lje.env.save_random_state() -- Save random state to avoid detection via PRNG state
         aimbot.run()
 
         cam.Start2D()
@@ -41,6 +42,7 @@ hook.pre("DrawRT", "gilbhax.ui", function()
             esp.run()
         render.PopRenderTarget()
         cam.End2D()
+    lje.env.restore_random_state() -- Restore random state
     lje.env.enable_metatables()
 end)
 

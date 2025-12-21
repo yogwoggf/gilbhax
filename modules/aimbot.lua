@@ -10,7 +10,6 @@ local pid = lje.include("util/pid.lua")
 
 local config = lje.require("config/aimbot.lua")
 config:save()
-
 local aimbot = {}
 aimbot.target = nil
 -- integrals aren't used, because of steady state error not being an issue in aimbot

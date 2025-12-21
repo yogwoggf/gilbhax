@@ -4,6 +4,7 @@
 name = "gilbhax"
 version = "1.0.0"
 author = "yogwoggf"
+url = "https://github.com/yogwoggf/gilbhax" # Not required, in fact not even used, but can be helpful for automation/documentation.
 dependencies = [
     "Eyoko1.ljeutil"
 ]
