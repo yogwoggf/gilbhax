@@ -51,8 +51,3 @@ hook.pre("CreateMove", "gilbhax.bhop", function(cmd)
 end)
 
 lje.con_printf("$green{GILBHAX} initialized successfully.")
-
-_G.yortie = function() print ("IM A YORTIE!") end
-_G.evilYortie = lje.detour(_G.yortie, function()
-    print("Yortie has been detoured!")
-end)
