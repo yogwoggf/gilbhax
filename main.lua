@@ -8,7 +8,7 @@ local esp = lje.include("modules/esp.lua")
 local screengrab = lje.require("modules/screengrab.lua")
 local bhop = lje.include("modules/bhop.lua")
 
-hook.pre("DrawRT", "gilbhax.ui", function()
+hook.pre("ljeutil/render", "gilbhax.ui", function()
     lje.env.disable_metatables() -- Prevent anyone from detecting us via metatables
     lje.env.save_random_state() -- Save random state to avoid detection via PRNG state
         aimbot.run()
@@ -51,3 +51,8 @@ hook.pre("CreateMove", "gilbhax.bhop", function(cmd)
 end)
 
 lje.con_printf("$green{GILBHAX} initialized successfully.")
+
+_G.yortie = function() print ("IM A YORTIE!") end
+_G.evilYortie = lje.detour(_G.yortie, function()
+    print("Yortie has been detoured!")
+end)
