@@ -4,7 +4,7 @@
 lje = lje or {}
 local aimbot = lje.include("modules/aimbot.lua")
 local esp = lje.include("modules/esp.lua")
-local screengrab = lje.require("modules/screengrab.lua")
+local screengrab = lje.require("detours/screengrab.lua")
 local bhop = lje.include("modules/bhop.lua")
 local freecam = lje.include("modules/freecam.lua")
 

@@ -1,5 +1,6 @@
 local pid = {}
 pid.__index = pid
+lje.env.auth_metatable(pid)
 
 local SMOOTH_NOISE_AMPLITUDE = 0.2 -- degrees
 local SMOOTH_NOISE_OFFSET = SMOOTH_NOISE_AMPLITUDE / 2

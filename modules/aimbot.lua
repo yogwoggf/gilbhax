@@ -1,5 +1,5 @@
 local pid = lje.include("util/pid.lua")
-
+local players = lje.require("util/players.lua")
 local config = lje.require("config/aimbot.lua")
 config:save()
 local aimbot = {}
@@ -37,8 +37,8 @@ function aimbot.run()
     -- This is a little gross so brace yourself
     if not aimbot.target and input.IsKeyDown(aimbot.bind_code) and not vgui.CursorVisible() then
         local qualifiedPlayers = {}
-        for _, ply in ipairs(player.GetAll()) do
-            if ply ~= LocalPlayer() and LocalPlayer():GetPos():Distance(ply:GetPos()) <= config.min_distance and ply:Alive() then
+        for _, ply in ipairs(players.getOthers()) do
+            if LocalPlayer():GetPos():Distance(ply:GetPos()) <= config.min_distance then
                 table.insert(qualifiedPlayers, ply)
             end
         end
@@ -72,6 +72,12 @@ function aimbot.run()
     if aimbot.target and aimbot.target:Alive() then
         local lp = LocalPlayer()
         local targetPos = aimbot.target:GetBonePosition(aimbot.target:GetHitBoxBone(0, 0))
+        -- If targets have a model we don't have, bones wont be loaded clientside. We're going to have to
+        -- just use their origin and lift it a little (constant offset since everything uses the error model)
+        if targetPos == aimbot.target:GetPos() then
+            targetPos = aimbot.target:GetPos() + Vector(0, 0, 50)
+        end
+
         local selfVelPredict = lp:GetVelocity() * config.self_velocity_compensation
         targetPos = targetPos - selfVelPredict
 
